@@ -1,33 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+
 import 'core/config/firebase_options.dart';
 import 'view/login_screen.dart';
+import 'view-model/auth_viewmodel.dart';
 
 void main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const MainApp());
-
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthViewModel()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-return MaterialApp(
-      title: 'My Trainning Path Login',
+    return MaterialApp(
+      title: 'My Training Path',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // Configuración básica del tema para combinar con el diseño oscuro
         scaffoldBackgroundColor: const Color(0xFF0F0F0F),
         useMaterial3: true,
-        // Puedes definir un tema de texto blanco por defecto aquí si lo prefieres
       ),
-      home: LoginScreen(),
+      home: const LoginScreen(),
     );
   }
 }
