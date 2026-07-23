@@ -16,7 +16,7 @@ class AuthViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // METODO LOGIN
+  // LOGIN CON EMAIL
   Future<bool> login(String email, String password) async {
     if (email.isEmpty || password.isEmpty) {
       _errorMessage = 'Por favor, completa todos los campos.';
@@ -30,7 +30,7 @@ class AuthViewModel extends ChangeNotifier {
     try {
       await _authService.signInWithEmail(email: email.trim(), password: password);
       _setLoading(false);
-      return true; // Login exitoso
+      return true;
     } on FirebaseAuthException catch (e) {
       _errorMessage = _parseAuthException(e);
       _setLoading(false);
@@ -42,7 +42,7 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  // METODO REGISTRO
+  // REGISTRO CON EMAIL
   Future<bool> register(String email, String password) async {
     if (email.isEmpty || password.isEmpty) {
       _errorMessage = 'Por favor, completa todos los campos.';
@@ -62,7 +62,7 @@ class AuthViewModel extends ChangeNotifier {
     try {
       await _authService.signUpWithEmail(email: email.trim(), password: password);
       _setLoading(false);
-      return true; // Registro exitoso
+      return true;
     } on FirebaseAuthException catch (e) {
       _errorMessage = _parseAuthException(e);
       _setLoading(false);
@@ -74,7 +74,23 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  // Traducir errores de Firebase a español
+  // LOGIN CON GOOGLE
+Future<bool> loginWithGoogle() async {
+    _setLoading(true);
+    _errorMessage = null;
+
+    try {
+      final userCredential = await _authService.signInWithGoogle();
+      _setLoading(false);
+      return userCredential != null;
+    } catch (e) {
+      print('🔴 DETALLE DEL ERROR DE GOOGLE: $e'); //  Nos dirá el motivo exacto en la terminal
+      _errorMessage = 'Error al iniciar sesión con Google.';
+      _setLoading(false);
+      return false;
+    }
+  }
+
   String _parseAuthException(FirebaseAuthException e) {
     switch (e.code) {
       case 'email-already-in-use':

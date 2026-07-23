@@ -51,7 +51,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // --- ACCIÓN BOTÓN LOGIN ---
   void _onLoginPressed() async {
     await _saveEmail();
 
@@ -66,17 +65,36 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
 
     if (success) {
-      // NAVEGA A LA NUEVA PANTALLA (HOME) Y ELIMINA EL LOGIN DEL STACK
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
     } else {
-      // Muestra el mensaje de error si las credenciales son incorrectas
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.redAccent,
           content: Text(authViewModel.errorMessage ?? 'Error al iniciar sesión'),
+        ),
+      );
+    }
+  }
+
+  void _onGoogleLoginPressed() async {
+    final authViewModel = context.read<AuthViewModel>();
+    final success = await authViewModel.loginWithGoogle();
+
+    if (!mounted) return;
+
+    if (success) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+    } else if (authViewModel.errorMessage != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.redAccent,
+          content: Text(authViewModel.errorMessage!),
         ),
       );
     }
@@ -114,15 +132,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
 
-                    SizedBox(height: screenHeight * 0.07),
+                    SizedBox(height: screenHeight * 0.06),
 
                     _buildTextField('Email', Icons.email_outlined, _emailController),
                     SizedBox(height: screenHeight * 0.025),
                     _buildTextField('Password', Icons.lock_outline, _passwordController, isObscure: true),
 
-                    SizedBox(height: screenHeight * 0.09),
+                    SizedBox(height: screenHeight * 0.06),
 
-                    // BOTÓN NAVEGAR A REGISTRO
+                    // BOTÓN REGISTER
                     InkWell(
                       onTap: () {
                         Navigator.push(
@@ -142,6 +160,39 @@ class _LoginScreenState extends State<LoginScreen> {
                             onTap: _onLoginPressed,
                             child: const Text('login', style: TextStyle(color: Colors.white, fontSize: 20)),
                           ),
+
+                    SizedBox(height: screenHeight * 0.04),
+
+                    // SEPARADOR Y OPCIÓN GOOGLE
+                    const Row(
+                      children: [
+                        Expanded(child: Divider(color: Colors.white24)),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          child: Text('o continúa con', style: TextStyle(color: Colors.white54, fontSize: 14)),
+                        ),
+                        Expanded(child: Divider(color: Colors.white24)),
+                      ],
+                    ),
+
+                    SizedBox(height: screenHeight * 0.03),
+
+                    // BOTÓN CONTINUAR CON GOOGLE
+                    OutlinedButton.icon(
+                      onPressed: authViewModel.isLoading ? null : _onGoogleLoginPressed,
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.white38),
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      icon: const Icon(Icons.g_mobiledata, color: _customYellow, size: 32),
+                      label: const Text(
+                        'Google',
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                    ),
                   ],
                 ),
               ),
