@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'forgot_password_screen.dart';
 import '../view-model/auth_viewmodel.dart';
 import 'home_screen.dart';
 import 'register_screen.dart';
@@ -138,7 +138,25 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(height: screenHeight * 0.025),
                     _buildTextField('Password', Icons.lock_outline, _passwordController, isObscure: true),
 
-                    SizedBox(height: screenHeight * 0.06),
+                    // --- ENLACE A RECUPERACIÓN DE CONTRASEÑA ---
+                    const SizedBox(height: 12),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
+                          );
+                        },
+                        child: const Text(
+                          '¿Olvidaste tu contraseña?',
+                          style: TextStyle(color: Colors.white60, fontSize: 14),
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: screenHeight * 0.05),
 
                     // BOTÓN REGISTER
                     InkWell(

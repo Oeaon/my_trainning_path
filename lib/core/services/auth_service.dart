@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'dart:ui' as ui;
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -50,6 +51,17 @@ class AuthService {
     }
   }
 
+// Restablecer contraseña respetando el idioma del dispositivo
+  Future<void> sendPasswordResetEmail(String email) async {
+    // 1. Obtiene el código de idioma del teléfono (ej: 'es', 'en', 'fr')
+    final String deviceLanguage = ui.PlatformDispatcher.instance.locale.languageCode;
+
+    // 2. Le indica a Firebase Auth que use ese idioma para el correo
+    await _auth.setLanguageCode(deviceLanguage);
+
+    // 3. Envía el correo
+    await _auth.sendPasswordResetEmail(email: email);
+  }
   // Cerrar sesión en ambos servicios
   Future<void> signOut() async {
     await _googleSignIn.signOut();

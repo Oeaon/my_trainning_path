@@ -91,11 +91,39 @@ Future<bool> loginWithGoogle() async {
     }
   }
 
+  // RESTABLECER CONTRASEÑA:
+
+Future<bool> resetPassword(String email) async {
+  if (email.isEmpty) {
+    _errorMessage = 'Por favor, introduce tu correo electrónico.';
+    notifyListeners();
+    return false;
+  }
+
+  _setLoading(true);
+  _errorMessage = null;
+
+  try {
+    await _authService.sendPasswordResetEmail(email.trim());
+    _setLoading(false);
+    return true; // Enlace enviado con éxito
+  } on FirebaseAuthException catch (e) {
+    _errorMessage = _parseAuthException(e);
+    _setLoading(false);
+    return false;
+  } catch (e) {
+    _errorMessage = 'Ocurrió un error al enviar el correo de recuperación.';
+    _setLoading(false);
+    return false;
+  }
+}
+
   String _parseAuthException(FirebaseAuthException e) {
     switch (e.code) {
       case 'email-already-in-use':
         return 'Este correo ya está registrado por otro usuario.';
       case 'user-not-found':
+  return 'No existe ninguna cuenta registrada con este correo.';
       case 'wrong-password':
       case 'invalid-credential':
         return 'Correo o contraseña incorrectos.';
