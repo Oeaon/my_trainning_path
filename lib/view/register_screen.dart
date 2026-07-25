@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../view-model/auth_viewmodel.dart';
+import 'package:my_trainning_path/l10n/app_localizations.dart';
 import 'home_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -16,27 +17,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   static const Color _customYellow = Color(0xFFEBC134);
 
-  void _onRegisterPressed() async {
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+void _onRegisterPressed() async {
     final authViewModel = context.read<AuthViewModel>();
+    final loc = AppLocalizations.of(context)!;
+
     final success = await authViewModel.register(
       _emailController.text,
       _passwordController.text,
+      loc,
     );
 
     if (!mounted) return;
 
     if (success) {
-      // Si el registro es correcto, navega a HomeScreen
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
     } else {
-      // Muestra error devuelto por Firebase (ej: usuario ya registrado)
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.redAccent,
-          content: Text(authViewModel.errorMessage ?? 'Error al registrar'),
+          content: Text(authViewModel.errorMessage ?? loc.registerError),
         ),
       );
     }
@@ -44,11 +53,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final authViewModel = context.watch<AuthViewModel>();
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F0F),
-      appBar: AppBar(backgroundColor: Colors.transparent, iconTheme: const IconThemeData(color: Colors.white)),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent, 
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -57,42 +70,51 @@ class _RegisterScreenState extends State<RegisterScreen> {
               constraints: const BoxConstraints(maxWidth: 420),
               child: Column(
                 children: [
-                  const Text(
-                    'CREAR CUENTA',
-                    style: TextStyle(
+                  Text(
+                    loc.createAccount.toUpperCase(),
+                    style: const TextStyle(
                       color: _customYellow,
                       fontSize: 36,
-                     // fontWeight: FontWeight.bold,
                       fontFamily: 'GrindAndDeath',
                     ),
                   ),
                   const SizedBox(height: 40),
+                  
                   TextField(
                     controller: _emailController,
                     style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      labelStyle: TextStyle(color: Colors.white),
-                      focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: _customYellow)),
+                    decoration: InputDecoration(
+                      labelText: loc.email,
+                      labelStyle: const TextStyle(color: Colors.white),
+                      focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: _customYellow),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
+
                   TextField(
                     controller: _passwordController,
                     obscureText: true,
                     style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(
-                      labelText: 'Password (mínimo 6 caracteres)',
-                      labelStyle: TextStyle(color: Colors.white),
-                      focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: _customYellow)),
+                    decoration: InputDecoration(
+                      labelText: loc.password,
+                      labelStyle: const TextStyle(color: Colors.white),
+                      focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: _customYellow),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 50),
+
                   authViewModel.isLoading
                       ? const CircularProgressIndicator(color: _customYellow)
                       : InkWell(
                           onTap: _onRegisterPressed,
-                          child: const Text('Registrarse', style: TextStyle(color: Colors.white, fontSize: 22)),
+                          child: Text(
+                            loc.register, 
+                            style: const TextStyle(color: Colors.white, fontSize: 22),
+                          ),
                         ),
                 ],
               ),

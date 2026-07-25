@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:my_trainning_path/l10n/app_localizations.dart';
 import 'forgot_password_screen.dart';
 import '../view-model/auth_viewmodel.dart';
 import 'home_screen.dart';
@@ -51,15 +52,20 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _onLoginPressed() async {
+void _onLoginPressed() async {
     await _saveEmail();
 
     if (!mounted) return;
 
+    // 1. Obtenemos la localización
+    final loc = AppLocalizations.of(context)!; 
     final authViewModel = context.read<AuthViewModel>();
+
+    // 2. Pasamos 'loc' como tercer argumento a login()
     final success = await authViewModel.login(
       _emailController.text,
       _passwordController.text,
+      loc,
     );
 
     if (!mounted) return;
@@ -73,15 +79,17 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.redAccent,
-          content: Text(authViewModel.errorMessage ?? 'Error al iniciar sesión'),
+          content: Text(authViewModel.errorMessage ?? loc.loginError),
         ),
       );
     }
   }
 
-  void _onGoogleLoginPressed() async {
+void _onGoogleLoginPressed() async {
+    final loc = AppLocalizations.of(context)!; 
     final authViewModel = context.read<AuthViewModel>();
-    final success = await authViewModel.loginWithGoogle();
+
+    final success = await authViewModel.loginWithGoogle(loc); 
 
     if (!mounted) return;
 
@@ -102,6 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final authViewModel = context.watch<AuthViewModel>();
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -118,11 +127,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const FittedBox(
+                    FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
-                        'MY TRAINNING PATH',
-                        style: TextStyle(
+                        loc.appTitle.toUpperCase(),
+                        style: const TextStyle(
                           color: _customYellow,
                           fontSize: 42,
                           fontWeight: FontWeight.bold,
@@ -134,11 +143,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     SizedBox(height: screenHeight * 0.06),
 
-                    _buildTextField('Email', Icons.email_outlined, _emailController),
+                    _buildTextField(loc.email, Icons.email_outlined, _emailController),
                     SizedBox(height: screenHeight * 0.025),
-                    _buildTextField('Password', Icons.lock_outline, _passwordController, isObscure: true),
+                    _buildTextField(loc.password, Icons.lock_outline, _passwordController, isObscure: true),
 
-                    // --- ENLACE A RECUPERACIÓN DE CONTRASEÑA ---
                     const SizedBox(height: 12),
                     Align(
                       alignment: Alignment.centerRight,
@@ -149,16 +157,15 @@ class _LoginScreenState extends State<LoginScreen> {
                             MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
                           );
                         },
-                        child: const Text(
-                          '¿Olvidaste tu contraseña?',
-                          style: TextStyle(color: Colors.white60, fontSize: 14),
+                        child: Text(
+                          loc.forgottenPassword,
+                          style: const TextStyle(color: Colors.white60, fontSize: 14),
                         ),
                       ),
                     ),
 
                     SizedBox(height: screenHeight * 0.05),
 
-                    // BOTÓN REGISTER
                     InkWell(
                       onTap: () {
                         Navigator.push(
@@ -166,36 +173,42 @@ class _LoginScreenState extends State<LoginScreen> {
                           MaterialPageRoute(builder: (_) => const RegisterScreen()),
                         );
                       },
-                      child: const Text('Register', style: TextStyle(color: Colors.white, fontSize: 20)),
+                      child: Text(
+                        loc.register, 
+                        style: const TextStyle(color: Colors.white, fontSize: 20),
+                      ),
                     ),
 
                     SizedBox(height: screenHeight * 0.025),
 
-                    // BOTÓN LOGIN
                     authViewModel.isLoading
                         ? const CircularProgressIndicator(color: _customYellow)
                         : InkWell(
                             onTap: _onLoginPressed,
-                            child: const Text('login', style: TextStyle(color: Colors.white, fontSize: 20)),
+                            child: Text(
+                              loc.login, 
+                              style: const TextStyle(color: Colors.white, fontSize: 20),
+                            ),
                           ),
 
                     SizedBox(height: screenHeight * 0.04),
 
-                    // SEPARADOR Y OPCIÓN GOOGLE
-                    const Row(
+                    Row(
                       children: [
-                        Expanded(child: Divider(color: Colors.white24)),
+                        const Expanded(child: Divider(color: Colors.white24)),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12),
-                          child: Text('o continúa con', style: TextStyle(color: Colors.white54, fontSize: 14)),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Text(
+                            loc.orContinueWith, 
+                            style: const TextStyle(color: Colors.white54, fontSize: 14),
+                          ),
                         ),
-                        Expanded(child: Divider(color: Colors.white24)),
+                        const Expanded(child: Divider(color: Colors.white24)),
                       ],
                     ),
 
                     SizedBox(height: screenHeight * 0.03),
 
-                    // BOTÓN CONTINUAR CON GOOGLE
                     OutlinedButton.icon(
                       onPressed: authViewModel.isLoading ? null : _onGoogleLoginPressed,
                       style: OutlinedButton.styleFrom(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:my_trainning_path/l10n/app_localizations.dart';
 import '../view-model/auth_viewmodel.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -21,17 +22,24 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     super.dispose();
   }
 
-  void _onResetPressed() async {
+void _onResetPressed() async {
     final authViewModel = context.read<AuthViewModel>();
-    final success = await authViewModel.resetPassword(_emailController.text);
+    // 1. Obtenemos la localización
+    final loc = AppLocalizations.of(context)!;
+
+    // 2. Pasamos 'loc' como segundo argumento a resetPassword()
+    final success = await authViewModel.resetPassword(
+      _emailController.text,
+      loc,
+    );
 
     if (!mounted) return;
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           backgroundColor: Colors.green,
-          content: Text('Se ha enviado un enlace a tu correo para restablecer la contraseña.'),
+          content: Text(loc.resetPasswordSuccess),
         ),
       );
       Navigator.pop(context); // Volver al Login tras enviar el correo
@@ -39,7 +47,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.redAccent,
-          content: Text(authViewModel.errorMessage ?? 'Error al procesar la solicitud.'),
+          content: Text(authViewModel.errorMessage ?? loc.resetPasswordError),
         ),
       );
     }
@@ -47,6 +55,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final authViewModel = context.watch<AuthViewModel>();
 
     return Scaffold(
@@ -64,14 +73,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const FittedBox(
+                  // TÍTULO TRADUCIDO
+                  FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      'RECUPERAR CONTRASEÑA',
-                      style: TextStyle(
+                      loc.recoverPassword.toUpperCase(),
+                      style: const TextStyle(
                         color: _customYellow,
                         fontSize: 32,
-                       // fontWeight: FontWeight.bold,
                         fontFamily: 'GrindAndDeath',
                       ),
                       textAlign: TextAlign.center,
@@ -80,25 +89,27 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                   const SizedBox(height: 25),
 
-                  const Text(
-                    'Introduce tu correo electrónico registrado y te enviaremos un enlace para restablecer tu contraseña.',
-                    style: TextStyle(color: Colors.white70, fontSize: 16),
+                  // TEXTO EXPLICATIVO TRADUCIDO
+                  Text(
+                    loc.recoverPasswordText,
+                    style: const TextStyle(color: Colors.white70, fontSize: 16),
                     textAlign: TextAlign.center,
                   ),
 
                   const SizedBox(height: 40),
 
+                  // CAMPO EMAIL TRADUCIDO
                   TextField(
                     controller: _emailController,
                     style: const TextStyle(color: Colors.white, fontSize: 18),
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      labelStyle: TextStyle(color: Colors.white, fontSize: 18),
-                      prefixIcon: Icon(Icons.email_outlined, color: Colors.white70),
-                      enabledBorder: UnderlineInputBorder(
+                    decoration: InputDecoration(
+                      labelText: loc.email,
+                      labelStyle: const TextStyle(color: Colors.white, fontSize: 18),
+                      prefixIcon: const Icon(Icons.email_outlined, color: Colors.white70),
+                      enabledBorder: const UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.white54, width: 1.5),
                       ),
-                      focusedBorder: UnderlineInputBorder(
+                      focusedBorder: const UnderlineInputBorder(
                         borderSide: BorderSide(color: _customYellow, width: 2.0),
                       ),
                     ),
@@ -106,13 +117,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                   const SizedBox(height: 50),
 
+                  // BOTÓN TRADUCIDO
                   authViewModel.isLoading
                       ? const CircularProgressIndicator(color: _customYellow)
                       : InkWell(
                           onTap: _onResetPressed,
-                          child: const Text(
-                            'Enviar Enlace',
-                            style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                          child: Text(
+                            loc.sendLink,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                 ],

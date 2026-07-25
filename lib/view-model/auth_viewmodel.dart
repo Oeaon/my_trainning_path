@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:my_trainning_path/l10n/app_localizations.dart';
 import '../core/services/auth_service.dart';
 
 class AuthViewModel extends ChangeNotifier {
@@ -16,10 +17,10 @@ class AuthViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // LOGIN CON EMAIL
-  Future<bool> login(String email, String password) async {
+  // LOGIN CON EMAIL (Acepta 'loc' como 3er parámetro)
+  Future<bool> login(String email, String password, AppLocalizations loc) async {
     if (email.isEmpty || password.isEmpty) {
-      _errorMessage = 'Por favor, completa todos los campos.';
+      _errorMessage = loc.fillAllFields;
       notifyListeners();
       return false;
     }
@@ -32,26 +33,26 @@ class AuthViewModel extends ChangeNotifier {
       _setLoading(false);
       return true;
     } on FirebaseAuthException catch (e) {
-      _errorMessage = _parseAuthException(e);
+      _errorMessage = _parseAuthException(e, loc);
       _setLoading(false);
       return false;
     } catch (e) {
-      _errorMessage = 'Ocurrió un error inesperado.';
+      _errorMessage = loc.unexpectedError;
       _setLoading(false);
       return false;
     }
   }
 
-  // REGISTRO CON EMAIL
-  Future<bool> register(String email, String password) async {
+  // REGISTRO CON EMAIL (Acepta 'loc' como 3er parámetro)
+  Future<bool> register(String email, String password, AppLocalizations loc) async {
     if (email.isEmpty || password.isEmpty) {
-      _errorMessage = 'Por favor, completa todos los campos.';
+      _errorMessage = loc.fillAllFields;
       notifyListeners();
       return false;
     }
 
     if (password.length < 6) {
-      _errorMessage = 'La contraseña debe tener al menos 6 caracteres.';
+      _errorMessage = loc.passwordMinLengthError;
       notifyListeners();
       return false;
     }
@@ -64,18 +65,18 @@ class AuthViewModel extends ChangeNotifier {
       _setLoading(false);
       return true;
     } on FirebaseAuthException catch (e) {
-      _errorMessage = _parseAuthException(e);
+      _errorMessage = _parseAuthException(e, loc);
       _setLoading(false);
       return false;
     } catch (e) {
-      _errorMessage = 'Ocurrió un error inesperado al registrar.';
+      _errorMessage = loc.unexpectedRegisterError;
       _setLoading(false);
       return false;
     }
   }
 
-  // LOGIN CON GOOGLE
-Future<bool> loginWithGoogle() async {
+  // LOGIN CON GOOGLE (Acepta 'loc' como 1er parámetro)
+  Future<bool> loginWithGoogle(AppLocalizations loc) async {
     _setLoading(true);
     _errorMessage = null;
 
@@ -84,55 +85,54 @@ Future<bool> loginWithGoogle() async {
       _setLoading(false);
       return userCredential != null;
     } catch (e) {
-      print('🔴 DETALLE DEL ERROR DE GOOGLE: $e'); //  Nos dirá el motivo exacto en la terminal
-      _errorMessage = 'Error al iniciar sesión con Google.';
+      print('🔴 DETALLE DEL ERROR DE GOOGLE: $e');
+      _errorMessage = loc.googleLoginError;
       _setLoading(false);
       return false;
     }
   }
 
-  // RESTABLECER CONTRASEÑA:
+  // RESTABLECER CONTRASEÑA (Acepta 'loc' como 2º parámetro)
+  Future<bool> resetPassword(String email, AppLocalizations loc) async {
+    if (email.isEmpty) {
+      _errorMessage = loc.enterEmailError;
+      notifyListeners();
+      return false;
+    }
 
-Future<bool> resetPassword(String email) async {
-  if (email.isEmpty) {
-    _errorMessage = 'Por favor, introduce tu correo electrónico.';
-    notifyListeners();
-    return false;
+    _setLoading(true);
+    _errorMessage = null;
+
+    try {
+      await _authService.sendPasswordResetEmail(email.trim());
+      _setLoading(false);
+      return true;
+    } on FirebaseAuthException catch (e) {
+      _errorMessage = _parseAuthException(e, loc);
+      _setLoading(false);
+      return false;
+    } catch (e) {
+      _errorMessage = loc.resetPasswordEmailError;
+      _setLoading(false);
+      return false;
+    }
   }
 
-  _setLoading(true);
-  _errorMessage = null;
-
-  try {
-    await _authService.sendPasswordResetEmail(email.trim());
-    _setLoading(false);
-    return true; // Enlace enviado con éxito
-  } on FirebaseAuthException catch (e) {
-    _errorMessage = _parseAuthException(e);
-    _setLoading(false);
-    return false;
-  } catch (e) {
-    _errorMessage = 'Ocurrió un error al enviar el correo de recuperación.';
-    _setLoading(false);
-    return false;
-  }
-}
-
-  String _parseAuthException(FirebaseAuthException e) {
+  String _parseAuthException(FirebaseAuthException e, AppLocalizations loc) {
     switch (e.code) {
       case 'email-already-in-use':
-        return 'Este correo ya está registrado por otro usuario.';
+        return loc.emailAlreadyInUseError;
       case 'user-not-found':
-  return 'No existe ninguna cuenta registrada con este correo.';
+        return loc.userNotFoundError;
       case 'wrong-password':
       case 'invalid-credential':
-        return 'Correo o contraseña incorrectos.';
+        return loc.wrongPasswordOrCredentialError;
       case 'invalid-email':
-        return 'El formato del correo electrónico no es válido.';
+        return loc.invalidEmailError;
       case 'weak-password':
-        return 'La contraseña es muy débil (mínimo 6 caracteres).';
+        return loc.weakPasswordError;
       default:
-        return 'Error de autenticación: ${e.message}';
+        return '${loc.authError}: ${e.message}';
     }
   }
 }
