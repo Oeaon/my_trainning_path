@@ -5,19 +5,16 @@ import 'l10n/app_localizations.dart';
 import 'core/config/firebase_options.dart';
 import 'view/login_screen.dart';
 import 'view-model/auth_viewmodel.dart';
+import 'view/calculateScreen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(
     MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthViewModel()),
-      ],
+      providers: [ChangeNotifierProvider(create: (_) => AuthViewModel())],
       child: const MyApp(),
     ),
   );
@@ -55,7 +52,8 @@ class MyApp extends StatelessWidget {
         return const Locale('es');
       },
 
-      home: const LoginScreen(),
+      //home: const LoginScreen(),
+      home: const CalculateScreen(),
     );
   }
 }
