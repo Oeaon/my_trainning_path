@@ -5,6 +5,7 @@ import 'package:my_trainning_path/l10n/app_localizations.dart';
 import 'forgot_password_screen.dart';
 import '../view-model/auth_viewmodel.dart';
 import 'home_screen.dart';
+import 'CalculateScreen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -52,13 +53,13 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-void _onLoginPressed() async {
+  void _onLoginPressed() async {
     await _saveEmail();
 
     if (!mounted) return;
 
     // 1. Obtenemos la localización
-    final loc = AppLocalizations.of(context)!; 
+    final loc = AppLocalizations.of(context)!;
     final authViewModel = context.read<AuthViewModel>();
 
     // 2. Pasamos 'loc' como tercer argumento a login()
@@ -73,7 +74,7 @@ void _onLoginPressed() async {
     if (success) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        MaterialPageRoute(builder: (_) => const CalculateScreen()),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -85,18 +86,18 @@ void _onLoginPressed() async {
     }
   }
 
-void _onGoogleLoginPressed() async {
-    final loc = AppLocalizations.of(context)!; 
+  void _onGoogleLoginPressed() async {
+    final loc = AppLocalizations.of(context)!;
     final authViewModel = context.read<AuthViewModel>();
 
-    final success = await authViewModel.loginWithGoogle(loc); 
+    final success = await authViewModel.loginWithGoogle(loc);
 
     if (!mounted) return;
 
     if (success) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        MaterialPageRoute(builder: (_) => const CalculateScreen()),
       );
     } else if (authViewModel.errorMessage != null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -120,7 +121,10 @@ void _onGoogleLoginPressed() async {
         child: Center(
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 16.0,
+              ),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 420),
                 child: Column(
@@ -143,9 +147,18 @@ void _onGoogleLoginPressed() async {
 
                     SizedBox(height: screenHeight * 0.06),
 
-                    _buildTextField(loc.email, Icons.email_outlined, _emailController),
+                    _buildTextField(
+                      loc.email,
+                      Icons.email_outlined,
+                      _emailController,
+                    ),
                     SizedBox(height: screenHeight * 0.025),
-                    _buildTextField(loc.password, Icons.lock_outline, _passwordController, isObscure: true),
+                    _buildTextField(
+                      loc.password,
+                      Icons.lock_outline,
+                      _passwordController,
+                      isObscure: true,
+                    ),
 
                     const SizedBox(height: 12),
                     Align(
@@ -154,12 +167,17 @@ void _onGoogleLoginPressed() async {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
+                            MaterialPageRoute(
+                              builder: (_) => const ForgotPasswordScreen(),
+                            ),
                           );
                         },
                         child: Text(
                           loc.forgottenPassword,
-                          style: const TextStyle(color: Colors.white60, fontSize: 14),
+                          style: const TextStyle(
+                            color: Colors.white60,
+                            fontSize: 14,
+                          ),
                         ),
                       ),
                     ),
@@ -170,12 +188,17 @@ void _onGoogleLoginPressed() async {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                          MaterialPageRoute(
+                            builder: (_) => const RegisterScreen(),
+                          ),
                         );
                       },
                       child: Text(
-                        loc.register, 
-                        style: const TextStyle(color: Colors.white, fontSize: 20),
+                        loc.register,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                        ),
                       ),
                     ),
 
@@ -186,8 +209,11 @@ void _onGoogleLoginPressed() async {
                         : InkWell(
                             onTap: _onLoginPressed,
                             child: Text(
-                              loc.login, 
-                              style: const TextStyle(color: Colors.white, fontSize: 20),
+                              loc.login,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                              ),
                             ),
                           ),
 
@@ -199,8 +225,11 @@ void _onGoogleLoginPressed() async {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           child: Text(
-                            loc.orContinueWith, 
-                            style: const TextStyle(color: Colors.white54, fontSize: 14),
+                            loc.orContinueWith,
+                            style: const TextStyle(
+                              color: Colors.white54,
+                              fontSize: 14,
+                            ),
                           ),
                         ),
                         const Expanded(child: Divider(color: Colors.white24)),
@@ -210,15 +239,24 @@ void _onGoogleLoginPressed() async {
                     SizedBox(height: screenHeight * 0.03),
 
                     OutlinedButton.icon(
-                      onPressed: authViewModel.isLoading ? null : _onGoogleLoginPressed,
+                      onPressed: authViewModel.isLoading
+                          ? null
+                          : _onGoogleLoginPressed,
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Colors.white38),
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
                       ),
-                      icon: const Icon(Icons.g_mobiledata, color: _customYellow, size: 32),
+                      icon: const Icon(
+                        Icons.g_mobiledata,
+                        color: _customYellow,
+                        size: 32,
+                      ),
                       label: const Text(
                         'Google',
                         style: TextStyle(color: Colors.white, fontSize: 18),
@@ -234,7 +272,12 @@ void _onGoogleLoginPressed() async {
     );
   }
 
-  Widget _buildTextField(String label, IconData icon, TextEditingController controller, {bool isObscure = false}) {
+  Widget _buildTextField(
+    String label,
+    IconData icon,
+    TextEditingController controller, {
+    bool isObscure = false,
+  }) {
     return TextField(
       controller: controller,
       obscureText: isObscure,
@@ -243,9 +286,16 @@ void _onGoogleLoginPressed() async {
         labelText: label,
         labelStyle: const TextStyle(color: Colors.white, fontSize: 18),
         prefixIcon: Icon(icon, color: Colors.white70),
-        enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.white54, width: 1.5)),
-        focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: _customYellow, width: 2.0)),
-        contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 10.0),
+        enabledBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.white54, width: 1.5),
+        ),
+        focusedBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: _customYellow, width: 2.0),
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 16.0,
+          horizontal: 10.0,
+        ),
       ),
     );
   }

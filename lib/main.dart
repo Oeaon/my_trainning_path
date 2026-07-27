@@ -52,8 +52,7 @@ class MyApp extends StatelessWidget {
         return const Locale('es');
       },
 
-      //home: const LoginScreen(),
-      home: const CalculateScreen(),
+      home: const LoginScreen(),
     );
   }
 }

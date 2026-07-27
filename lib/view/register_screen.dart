@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../view-model/auth_viewmodel.dart';
 import 'package:my_trainning_path/l10n/app_localizations.dart';
 import 'home_screen.dart';
+import 'CalculateScreen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -24,7 +25,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-void _onRegisterPressed() async {
+  void _onRegisterPressed() async {
     final authViewModel = context.read<AuthViewModel>();
     final loc = AppLocalizations.of(context)!;
 
@@ -39,7 +40,7 @@ void _onRegisterPressed() async {
     if (success) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        MaterialPageRoute(builder: (_) => const CalculateScreen()),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -59,7 +60,7 @@ void _onRegisterPressed() async {
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F0F),
       appBar: AppBar(
-        backgroundColor: Colors.transparent, 
+        backgroundColor: Colors.transparent,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SafeArea(
@@ -79,7 +80,7 @@ void _onRegisterPressed() async {
                     ),
                   ),
                   const SizedBox(height: 40),
-                  
+
                   TextField(
                     controller: _emailController,
                     style: const TextStyle(color: Colors.white),
@@ -112,8 +113,11 @@ void _onRegisterPressed() async {
                       : InkWell(
                           onTap: _onRegisterPressed,
                           child: Text(
-                            loc.register, 
-                            style: const TextStyle(color: Colors.white, fontSize: 22),
+                            loc.register,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                            ),
                           ),
                         ),
                 ],
